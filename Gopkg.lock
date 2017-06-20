@@ -25,6 +25,12 @@
   revision = "fe6ea2c8e398672518ef204bf0fbd9af858d0e15"
 
 [[projects]]
+  name = "github.com/patrickmn/go-cache"
+  packages = ["."]
+  revision = "1881a9bccb818787f68c52bfba648c6cf34c34fa"
+  version = "v2.0.0"
+
+[[projects]]
   branch = "master"
   name = "go4.org"
   packages = ["syncutil"]
@@ -45,6 +51,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "75d612a667e358fa0370f3dc2c0452fb266f38acebfa1b43e7bfe501b7e8162c"
+  inputs-digest = "4370cc081bb7a62f57ae1ac5f3b936b1f5259a952ccf4fbf4c6d9d5c76dff336"
   solver-name = "gps-cdcl"
   solver-version = 1

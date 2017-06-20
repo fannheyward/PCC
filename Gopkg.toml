@@ -73,3 +73,6 @@
 [[constraint]]
   name = "github.com/go-redis/redis"
   version = "6.5.0"
+
+[[constraint]]
+  name = "github.com/patrickmn/go-cache"

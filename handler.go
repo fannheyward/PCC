@@ -6,6 +6,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
+	"github.com/patrickmn/go-cache"
 )
 
 func insertAtFirst(origin []map[string]string, item map[string]string) []map[string]string {
@@ -59,10 +60,18 @@ func likeHandler(c *gin.Context, oid, uid string) {
 
 func isLikeHandler(c *gin.Context, oid, uid string) {
 	isLike := 0
-	score := cli.ZScore(fmt.Sprintf("like:%s", oid), uid).Val()
-	if score > 0 {
+	cacheKey := fmt.Sprintf("cache_like:%s:%s", oid, uid)
+	_, exist := mc.Get(cacheKey)
+	if exist {
 		isLike = 1
+	} else {
+		score := cli.ZScore(fmt.Sprintf("like:%s", oid), uid).Val()
+		if score > 0 {
+			isLike = 1
+			mc.Set(cacheKey, 1, cache.NoExpiration)
+		}
 	}
+
 	c.JSON(200, map[string]interface{}{
 		"oid":     strToInt(oid),
 		"uid":     strToInt(uid),

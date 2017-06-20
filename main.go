@@ -1,11 +1,17 @@
 package main
 
 import (
+	"time"
+
 	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis"
+	"github.com/patrickmn/go-cache"
 )
 
-var cli *redis.Client
+var (
+	cli *redis.Client
+	mc  *cache.Cache
+)
 
 func init() {
 	cli = redis.NewClient(&redis.Options{
@@ -16,6 +22,8 @@ func init() {
 	if err != nil {
 		panic("redis failed")
 	}
+
+	mc = cache.New(cache.NoExpiration, time.Minute)
 }
 
 func handler(c *gin.Context) {
