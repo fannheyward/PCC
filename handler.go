@@ -21,9 +21,24 @@ func insertAtFirst(origin []map[string]string, item map[string]string) []map[str
 	return newList
 }
 
-func likeHandler(c *gin.Context, oid, uid string) {
+func isLiked(oid, uid string) bool {
+	cacheKey := fmt.Sprintf("cache_like:%s:%s", oid, uid)
+	_, exist := mc.Get(cacheKey)
+	if exist {
+		return true
+	}
+
 	score := cli.ZScore(fmt.Sprintf("like:%s", oid), uid).Val()
 	if score > 0 {
+		mc.Set(cacheKey, 1, cache.NoExpiration)
+		return true
+	}
+	return false
+}
+
+func likeHandler(c *gin.Context, oid, uid string) {
+	liked := isLiked(oid, uid)
+	if liked {
 		c.JSON(200, errInfo("already liked"))
 		return
 	}
@@ -60,16 +75,8 @@ func likeHandler(c *gin.Context, oid, uid string) {
 
 func isLikeHandler(c *gin.Context, oid, uid string) {
 	isLike := 0
-	cacheKey := fmt.Sprintf("cache_like:%s:%s", oid, uid)
-	_, exist := mc.Get(cacheKey)
-	if exist {
+	if isLiked(oid, uid) {
 		isLike = 1
-	} else {
-		score := cli.ZScore(fmt.Sprintf("like:%s", oid), uid).Val()
-		if score > 0 {
-			isLike = 1
-			mc.Set(cacheKey, 1, cache.NoExpiration)
-		}
 	}
 
 	c.JSON(200, map[string]interface{}{
